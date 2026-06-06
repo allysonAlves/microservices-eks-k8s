@@ -1,0 +1,18 @@
+aws_region   = "us-east-1"
+project_name = "togglemaster"
+environment  = "production"
+
+# EKS
+eks_node_instance_type = "t3.medium"
+eks_node_min           = 1
+eks_node_desired       = 2
+eks_node_max           = 4
+
+# RDS
+db_instance_class = "db.t3.micro"
+db_username       = "postgres"
+db_password       = "CHANGE_ME_strong_password_123"
+
+# App secrets
+auth_master_key = "CHANGE_ME_master_key"
+service_api_key = "CHANGE_ME_service_api_key"

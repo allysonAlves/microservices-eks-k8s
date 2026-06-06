@@ -1,0 +1,341 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-06-06",
+  "__export_source": "togglemaster-local",
+  "resources": [
+    {
+      "_id": "wrk_togglemaster",
+      "_type": "workspace",
+      "name": "ToggleMaster",
+      "description": "Ecossistema de microsserviços ToggleMaster",
+      "scope": "collection"
+    },
+    {
+      "_id": "env_base",
+      "_type": "environment",
+      "parentId": "wrk_togglemaster",
+      "name": "Local",
+      "data": {
+        "auth_url": "http://localhost:8001",
+        "flag_url": "http://localhost:8002",
+        "targeting_url": "http://localhost:8003",
+        "evaluation_url": "http://localhost:8004",
+        "analytics_url": "http://localhost:8005",
+        "master_key": "master-key-local-dev",
+        "api_key": "COLE_SUA_API_KEY_AQUI"
+      },
+      "color": null,
+      "isPrivate": false
+    },
+    {
+      "_id": "fld_auth",
+      "_type": "request_group",
+      "parentId": "wrk_togglemaster",
+      "name": "1 - auth-service :8001",
+      "description": "Gerencia chaves de API e autenticação"
+    },
+    {
+      "_id": "req_auth_health",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "Health Check",
+      "method": "GET",
+      "url": "{{ _.auth_url }}/health",
+      "headers": [],
+      "body": {}
+    },
+    {
+      "_id": "req_auth_create_key",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "Criar API Key",
+      "method": "POST",
+      "url": "{{ _.auth_url }}/admin/keys",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.master_key }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"minha-chave\"\n}"
+      },
+      "description": "Retorna a key em texto plano UMA ÚNICA VEZ. Copie e cole em api_key no environment."
+    },
+    {
+      "_id": "req_auth_validate",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "Validar API Key",
+      "method": "GET",
+      "url": "{{ _.auth_url }}/validate",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.api_key }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "fld_flags",
+      "_type": "request_group",
+      "parentId": "wrk_togglemaster",
+      "name": "2 - flag-service :8002",
+      "description": "CRUD das feature flags"
+    },
+    {
+      "_id": "req_flags_health",
+      "_type": "request",
+      "parentId": "fld_flags",
+      "name": "Health Check",
+      "method": "GET",
+      "url": "{{ _.flag_url }}/health",
+      "headers": [],
+      "body": {}
+    },
+    {
+      "_id": "req_flags_create",
+      "_type": "request",
+      "parentId": "fld_flags",
+      "name": "Criar Flag",
+      "method": "POST",
+      "url": "{{ _.flag_url }}/flags",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.api_key }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"dark-mode\",\n  \"description\": \"Habilita o tema escuro\",\n  \"is_enabled\": true\n}"
+      }
+    },
+    {
+      "_id": "req_flags_list",
+      "_type": "request",
+      "parentId": "fld_flags",
+      "name": "Listar Flags",
+      "method": "GET",
+      "url": "{{ _.flag_url }}/flags",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.api_key }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_flags_get",
+      "_type": "request",
+      "parentId": "fld_flags",
+      "name": "Buscar Flag por Nome",
+      "method": "GET",
+      "url": "{{ _.flag_url }}/flags/dark-mode",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.api_key }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_flags_update",
+      "_type": "request",
+      "parentId": "fld_flags",
+      "name": "Atualizar Flag",
+      "method": "PUT",
+      "url": "{{ _.flag_url }}/flags/dark-mode",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.api_key }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"is_enabled\": false\n}"
+      }
+    },
+    {
+      "_id": "req_flags_delete",
+      "_type": "request",
+      "parentId": "fld_flags",
+      "name": "Deletar Flag",
+      "method": "DELETE",
+      "url": "{{ _.flag_url }}/flags/dark-mode",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.api_key }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "fld_targeting",
+      "_type": "request_group",
+      "parentId": "wrk_togglemaster",
+      "name": "3 - targeting-service :8003",
+      "description": "Regras de segmentação por flag"
+    },
+    {
+      "_id": "req_targeting_health",
+      "_type": "request",
+      "parentId": "fld_targeting",
+      "name": "Health Check",
+      "method": "GET",
+      "url": "{{ _.targeting_url }}/health",
+      "headers": [],
+      "body": {}
+    },
+    {
+      "_id": "req_targeting_create",
+      "_type": "request",
+      "parentId": "fld_targeting",
+      "name": "Criar Regra (50% dos usuários)",
+      "method": "POST",
+      "url": "{{ _.targeting_url }}/rules",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.api_key }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"flag_name\": \"dark-mode\",\n  \"is_enabled\": true,\n  \"rules\": {\n    \"type\": \"PERCENTAGE\",\n    \"value\": 50\n  }\n}"
+      },
+      "description": "Aplica a flag para 50% dos usuários de forma determinística por user_id"
+    },
+    {
+      "_id": "req_targeting_get",
+      "_type": "request",
+      "parentId": "fld_targeting",
+      "name": "Buscar Regra por Flag",
+      "method": "GET",
+      "url": "{{ _.targeting_url }}/rules/dark-mode",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.api_key }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_targeting_update",
+      "_type": "request",
+      "parentId": "fld_targeting",
+      "name": "Atualizar Regra (100%)",
+      "method": "PUT",
+      "url": "{{ _.targeting_url }}/rules/dark-mode",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.api_key }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"rules\": {\n    \"type\": \"PERCENTAGE\",\n    \"value\": 100\n  }\n}"
+      }
+    },
+    {
+      "_id": "req_targeting_delete",
+      "_type": "request",
+      "parentId": "fld_targeting",
+      "name": "Deletar Regra",
+      "method": "DELETE",
+      "url": "{{ _.targeting_url }}/rules/dark-mode",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.api_key }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "fld_evaluation",
+      "_type": "request_group",
+      "parentId": "wrk_togglemaster",
+      "name": "4 - evaluation-service :8004",
+      "description": "Avalia se uma flag está ativa para um usuário"
+    },
+    {
+      "_id": "req_eval_health",
+      "_type": "request",
+      "parentId": "fld_evaluation",
+      "name": "Health Check",
+      "method": "GET",
+      "url": "{{ _.evaluation_url }}/health",
+      "headers": [],
+      "body": {}
+    },
+    {
+      "_id": "req_eval_evaluate",
+      "_type": "request",
+      "parentId": "fld_evaluation",
+      "name": "Avaliar Flag para Usuário",
+      "method": "GET",
+      "url": "{{ _.evaluation_url }}/evaluate?user_id=usuario-123&flag_name=dark-mode",
+      "headers": [],
+      "body": {},
+      "description": "Não requer autenticação. Retorna true/false. Troque user_id para ver o efeito da regra de porcentagem."
+    },
+    {
+      "_id": "req_eval_evaluate_b",
+      "_type": "request",
+      "parentId": "fld_evaluation",
+      "name": "Avaliar Flag — outro usuário",
+      "method": "GET",
+      "url": "{{ _.evaluation_url }}/evaluate?user_id=usuario-456&flag_name=dark-mode",
+      "headers": [],
+      "body": {},
+      "description": "Mesmo flag, user_id diferente. Com regra de 50%, pode retornar resultado diferente."
+    },
+    {
+      "_id": "fld_analytics",
+      "_type": "request_group",
+      "parentId": "wrk_togglemaster",
+      "name": "5 - analytics-service :8005",
+      "description": "Worker SQS → DynamoDB. Só tem health check acessível localmente."
+    },
+    {
+      "_id": "req_analytics_health",
+      "_type": "request",
+      "parentId": "fld_analytics",
+      "name": "Health Check",
+      "method": "GET",
+      "url": "{{ _.analytics_url }}/health",
+      "headers": [],
+      "body": {}
+    }
+  ]
+}

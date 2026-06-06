@@ -1,0 +1,497 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: ToggleMaster
+meta:
+  id: wrk_d92acafffb2c44acaaddecd3b358ed62
+  created: 1780712074331
+  modified: 1780712074331
+  description: ""
+collection:
+  - name: 1 - auth-service :8001
+    meta:
+      id: fld_b4edf1d1cd1c4c918416bbed8e4cabe1
+      created: 1780712074333
+      modified: 1780712074333
+      sortKey: -1780712074333
+      description: Gerencia chaves de API e autenticação
+    children:
+      - url: "{{ _.auth_url }}/health"
+        name: Health Check
+        meta:
+          id: req_76cf791e875e4c678c372d2c7f49d3bc
+          created: 1780712074333
+          modified: 1780712074333
+          isPrivate: false
+          description: ""
+          sortKey: -1780712074333
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.auth_url }}/admin/keys"
+        name: Criar API Key
+        meta:
+          id: req_3a101e57365a4bd1bced5caa4a50b0eb
+          created: 1780712074334
+          modified: 1780712086000
+          isPrivate: false
+          description: Retorna a key em texto plano UMA ÚNICA VEZ. Copie e cole em api_key
+            no environment.
+          sortKey: -1780712074334
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "name": "minha-chave"
+            }
+        headers:
+          - name: Authorization
+            value: Bearer {{ _.master_key }}
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.auth_url }}/validate"
+        name: Validar API Key
+        meta:
+          id: req_6c643571279a4bb7b9fe934ac0c6f138
+          created: 1780712074334
+          modified: 1780712115680
+          isPrivate: false
+          description: ""
+          sortKey: -1780712074334
+        method: GET
+        headers:
+          - name: Authorization
+            value: Bearer {{ _.api_key }}
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 2 - flag-service :8002
+    meta:
+      id: fld_2603bcb9c49f46d9a2ec783b898b7b28
+      created: 1780712074334
+      modified: 1780712074334
+      sortKey: -1780712074334
+      description: CRUD das feature flags
+    children:
+      - url: "{{ _.flag_url }}/health"
+        name: Health Check
+        meta:
+          id: req_14697c651423441db9a91e181a7948a0
+          created: 1780712074334
+          modified: 1780712074334
+          isPrivate: false
+          description: ""
+          sortKey: -1780712074334
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.flag_url }}/flags/dark-mode"
+        name: Buscar Flag por Nome
+        meta:
+          id: req_44c71c63d4d24f2ab7b586e9d8338743
+          created: 1780712074335
+          modified: 1780712074335
+          isPrivate: false
+          description: ""
+          sortKey: -1780712074335
+        method: GET
+        headers:
+          - name: Authorization
+            value: Bearer {{ _.api_key }}
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.flag_url }}/flags"
+        name: Listar Flags
+        meta:
+          id: req_4bac1884ed9941b3a77edc13a7833eb8
+          created: 1780712074335
+          modified: 1780712074335
+          isPrivate: false
+          description: ""
+          sortKey: -1780712074335
+        method: GET
+        headers:
+          - name: Authorization
+            value: Bearer {{ _.api_key }}
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.flag_url }}/flags"
+        name: Criar Flag
+        meta:
+          id: req_b10d2acb9ff5464bb46e3484de1b2ad8
+          created: 1780712074335
+          modified: 1780712074335
+          isPrivate: false
+          description: ""
+          sortKey: -1780712074335
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "name": "dark-mode",
+              "description": "Habilita o tema escuro",
+              "is_enabled": true
+            }
+        headers:
+          - name: Authorization
+            value: Bearer {{ _.api_key }}
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.flag_url }}/flags/dark-mode"
+        name: Deletar Flag
+        meta:
+          id: req_34fa7065d17f4d88af3766fe1110487e
+          created: 1780712074336
+          modified: 1780712074336
+          isPrivate: false
+          description: ""
+          sortKey: -1780712074336
+        method: DELETE
+        headers:
+          - name: Authorization
+            value: Bearer {{ _.api_key }}
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.flag_url }}/flags/dark-mode"
+        name: Atualizar Flag
+        meta:
+          id: req_ad644cb37d6a4426a4e7a97a866b8a6a
+          created: 1780712074336
+          modified: 1780712074336
+          isPrivate: false
+          description: ""
+          sortKey: -1780712074336
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "is_enabled": false
+            }
+        headers:
+          - name: Authorization
+            value: Bearer {{ _.api_key }}
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 3 - targeting-service :8003
+    meta:
+      id: fld_86a78dc6cd834e409ba547c471e54e64
+      created: 1780712074336
+      modified: 1780712074336
+      sortKey: -1780712074336
+      description: Regras de segmentação por flag
+    children:
+      - url: "{{ _.targeting_url }}/health"
+        name: Health Check
+        meta:
+          id: req_7dd9ac24efe14c44a195625c487a05fe
+          created: 1780712074336
+          modified: 1780712074336
+          isPrivate: false
+          description: ""
+          sortKey: -1780712074336
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.targeting_url }}/rules/dark-mode"
+        name: Atualizar Regra (100%)
+        meta:
+          id: req_192db1af7cee434a94c8e48aae5fa195
+          created: 1780712074337
+          modified: 1780712074337
+          isPrivate: false
+          description: ""
+          sortKey: -1780712074337
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "rules": {
+                "type": "PERCENTAGE",
+                "value": 100
+              }
+            }
+        headers:
+          - name: Authorization
+            value: Bearer {{ _.api_key }}
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.targeting_url }}/rules"
+        name: Criar Regra (50% dos usuários)
+        meta:
+          id: req_58b1b93c051c47edaa5e84a4b216e78a
+          created: 1780712074337
+          modified: 1780712074337
+          isPrivate: false
+          description: Aplica a flag para 50% dos usuários de forma determinística por
+            user_id
+          sortKey: -1780712074337
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "flag_name": "dark-mode",
+              "is_enabled": true,
+              "rules": {
+                "type": "PERCENTAGE",
+                "value": 50
+              }
+            }
+        headers:
+          - name: Authorization
+            value: Bearer {{ _.api_key }}
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.targeting_url }}/rules/dark-mode"
+        name: Deletar Regra
+        meta:
+          id: req_5dbb3abfeb514365b4097344c2ed5def
+          created: 1780712074337
+          modified: 1780712074337
+          isPrivate: false
+          description: ""
+          sortKey: -1780712074337
+        method: DELETE
+        headers:
+          - name: Authorization
+            value: Bearer {{ _.api_key }}
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.targeting_url }}/rules/dark-mode"
+        name: Buscar Regra por Flag
+        meta:
+          id: req_5dcdf807361f469a831094ece874db11
+          created: 1780712074337
+          modified: 1780712074337
+          isPrivate: false
+          description: ""
+          sortKey: -1780712074337
+        method: GET
+        headers:
+          - name: Authorization
+            value: Bearer {{ _.api_key }}
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 4 - evaluation-service :8004
+    meta:
+      id: fld_e7073621009a4b2398436915cddd2d58
+      created: 1780712074337
+      modified: 1780712074337
+      sortKey: -1780712074337
+      description: Avalia se uma flag está ativa para um usuário
+    children:
+      - url: "{{ _.evaluation_url }}/health"
+        name: Health Check
+        meta:
+          id: req_26e103aff2e64e97b30a19a4087dfc66
+          created: 1780712074338
+          modified: 1780712074338
+          isPrivate: false
+          description: ""
+          sortKey: -1780712074338
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.evaluation_url }}/evaluate?user_id=usuario-123&flag_name=dark-mode"
+        name: Avaliar Flag para Usuário
+        meta:
+          id: req_9e37c8ba18c140358c324d17e7642dc8
+          created: 1780712074338
+          modified: 1780712074338
+          isPrivate: false
+          description: Não requer autenticação. Retorna true/false. Troque user_id para
+            ver o efeito da regra de porcentagem.
+          sortKey: -1780712074338
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.evaluation_url }}/evaluate?user_id=usuario-456&flag_name=dark-mode"
+        name: Avaliar Flag — outro usuário
+        meta:
+          id: req_fb0e70f0d2d842b08bdb707e9b9d6762
+          created: 1780712074338
+          modified: 1780712074338
+          isPrivate: false
+          description: Mesmo flag, user_id diferente. Com regra de 50%, pode retornar
+            resultado diferente.
+          sortKey: -1780712074338
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 5 - analytics-service :8005
+    meta:
+      id: fld_c31597193d7744f18d2e30266d97140f
+      created: 1780712074338
+      modified: 1780712074338
+      sortKey: -1780712074338
+      description: Worker SQS → DynamoDB. Só tem health check acessível localmente.
+    children:
+      - url: "{{ _.analytics_url }}/health"
+        name: Health Check
+        meta:
+          id: req_2696b1f1cdee4a329ac8a28bee03b4b9
+          created: 1780712074338
+          modified: 1780712074338
+          isPrivate: false
+          description: ""
+          sortKey: -1780712074338
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_e41e06c704e9b867812e5d99c81d1cbf4987afea
+    created: 1780712074446
+    modified: 1780712074446
+environments:
+  name: Local
+  meta:
+    id: env_9379a4630ca947feace58e1e829f1b42
+    created: 1780712074332
+    modified: 1780765478500
+    isPrivate: false
+  data:
+    auth_url: http://localhost:8001
+    flag_url: http://localhost:8002
+    targeting_url: http://localhost:8003
+    evaluation_url: http://localhost:8004
+    analytics_url: http://localhost:8005
+    master_key: master-key-local-dev
+    api_key: tm_key_502c008c5ff32a12ab3b253738e5cce02379636f1fe5cbe67df0da8ad9aeb46a
+  subEnvironments:
+    - name: AWS
+      meta:
+        id: env_6b27bb70ab774d139e7ce9605804df80
+        created: 1780765482771
+        modified: 1780765617194
+        isPrivate: false
+        sortKey: 1780765482772
+      data:
+        auth_url: http://af7da626fa797404e9242cfeff188720-1a217c8b04f5fdba.elb.us-east-1.amazonaws.com/auth/
+        flag_url: http://af7da626fa797404e9242cfeff188720-1a217c8b04f5fdba.elb.us-east-1.amazonaws.com/flags/
+        targeting_url: http://af7da626fa797404e9242cfeff188720-1a217c8b04f5fdba.elb.us-east-1.amazonaws.com/targeting/
+        evaluation_url: http://af7da626fa797404e9242cfeff188720-1a217c8b04f5fdba.elb.us-east-1.amazonaws.com/evaluating/
+        analytics_url: http://af7da626fa797404e9242cfeff188720-1a217c8b04f5fdba.elb.us-east-1.amazonaws.com/analytics/
+        master_key: master-key-local-dev
+        api_key: tm_key_502c008c5ff32a12ab3b253738e5cce02379636f1fe5cbe67df0da8ad9aeb46a
