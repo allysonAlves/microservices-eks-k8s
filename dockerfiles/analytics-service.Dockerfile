@@ -1,13 +1,19 @@
-FROM python:3.11-slim AS builder
+FROM python:3.11-alpine AS builder
 WORKDIR /app
+RUN python -m venv /venv
+ENV PATH="/venv/bin:$PATH"
 COPY requirements.txt .
-RUN pip install --no-cache-dir --user -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-FROM python:3.11-slim
+FROM python:3.11-alpine
+RUN addgroup -S appgroup && adduser -S -G appgroup -H -s /sbin/nologin appuser
 WORKDIR /app
-COPY --from=builder /root/.local /root/.local
-COPY . .
-ENV PATH=/root/.local/bin:$PATH
+COPY --from=builder --chown=appuser:appgroup /venv /venv
+COPY --chown=appuser:appgroup . .
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PATH="/venv/bin:$PATH"
+USER appuser
 EXPOSE 8005
 HEALTHCHECK --interval=10s --timeout=5s --retries=3 CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8005/health')" || exit 1
 CMD ["gunicorn", "--bind", "0.0.0.0:8005", "--workers", "1", "app:app"]
