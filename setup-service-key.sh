@@ -61,7 +61,7 @@ fi
 
 if [ "$ENV" = "local" ]; then
   echo "==> Reiniciando evaluation-service..."
-  docker compose restart evaluation-service
+  docker compose up -d evaluation-service
   echo ""
   echo "Concluido! Atualize api_key no Insomnia (ambiente Local): $NEW_KEY"
 else

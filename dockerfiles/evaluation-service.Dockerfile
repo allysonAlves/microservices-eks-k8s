@@ -3,7 +3,7 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o evaluation-service .
+RUN go mod tidy && CGO_ENABLED=0 GOOS=linux go build -o evaluation-service .
 
 FROM alpine:3.23.4
 RUN apk add --no-cache ca-certificates wget
