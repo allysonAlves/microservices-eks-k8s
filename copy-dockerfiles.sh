@@ -1,7 +1,7 @@
 #!/bin/bash
 # Copies Dockerfiles from dockerfiles/ into each service directory.
 # Optional — only needed if you want to commit the Dockerfile to the service repo.
-# docker-compose and push-images.sh already use dockerfiles/ directly via -f flag.
+# docker-compose and push-images.sh use the Dockerfile inside each services/<name>/ directly.
 set -e
 
 PROJECT_ROOT="$(cd "$(dirname "$0")" && pwd)"

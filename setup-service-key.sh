@@ -31,6 +31,20 @@ else
   AUTH_URL="http://${ELB}/auth"
 fi
 
+echo "==> Aguardando auth-service responder em $AUTH_URL/health..."
+MAX_ATTEMPTS=30
+ATTEMPT=0
+until curl -sf "${AUTH_URL}/health" > /dev/null 2>&1; do
+  ATTEMPT=$((ATTEMPT + 1))
+  if [ "$ATTEMPT" -ge "$MAX_ATTEMPTS" ]; then
+    echo "ERRO: auth-service nao respondeu apos $((MAX_ATTEMPTS * 10))s. Verifique 'kubectl get pods -n $NAMESPACE'."
+    exit 1
+  fi
+  echo "  aguardando... ($ATTEMPT/$MAX_ATTEMPTS)"
+  sleep 10
+done
+echo "==> auth-service OK."
+
 echo "==> Criando API key em $AUTH_URL..."
 RESPONSE=$(curl -s -X POST "${AUTH_URL}/admin/keys" \
   -H "Authorization: Bearer ${MASTER_KEY}" \

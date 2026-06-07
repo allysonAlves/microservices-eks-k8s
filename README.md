@@ -21,6 +21,7 @@ Ecossistema de 5 microsserviços implantado no Kubernetes (AWS EKS) com infraest
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) configurado (`aws configure`)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/)
 - [Git](https://git-scm.com/)
+- [hey](https://github.com/rakyll/hey) — gerador de carga para testes de HPA (`brew install hey`)
 
 ---
 
@@ -102,10 +103,17 @@ aws eks update-kubeconfig --region us-east-1 --name togglemaster-cluster
 # 3. Build e push das imagens para o ECR
 ./push-images.sh
 
-# 4. Cria a API key e configura o evaluation-service automaticamente
+# 4. Aguarde todos os pods ficarem prontos (~2-5 min após o push)
+kubectl rollout status deployment/auth-service -n togglemaster
+kubectl rollout status deployment/flag-service -n togglemaster
+kubectl rollout status deployment/targeting-service -n togglemaster
+kubectl rollout status deployment/evaluation-service -n togglemaster
+kubectl rollout status deployment/analytics-service -n togglemaster
+
+# 5. Cria a API key e configura o evaluation-service automaticamente
 ./setup-service-key.sh aws
 
-# 5. Atualize o campo api_key no Insomnia com o valor exibido pelo script
+# 6. Atualize o campo api_key no Insomnia com o valor exibido pelo script
 #    e selecione o ambiente "AWS"
 ```
 
@@ -121,32 +129,22 @@ kubectl get hpa -n togglemaster
 
 ## Demonstrar escalabilidade
 
-### HPA do evaluation-service (por CPU)
+Um único teste exercita o pipeline completo:  
+**hey → evaluation-service (CPU ↑ → HPA escala) → SQS → analytics-service (CPU ↑ → HPA escala) → DynamoDB**
 
 ```bash
-# Terminal 1 — gera carga
-hey -z 2m -c 50 http://<LB_URL>/evaluate/health
+# Obtém a URL do Load Balancer
+LB_URL=$(kubectl get ingress -n togglemaster -o jsonpath='{.items[0].status.loadBalancer.ingress[0].hostname}')
 
-# Terminal 2 — observa o HPA escalar
+# Terminal 1 — gera carga no endpoint real de avaliação
+hey -z 3m -c 200 \
+  "http://$LB_URL/evaluate/evaluate?user_id=user-test&flag_name=dark-mode"
+
+# Terminal 2 — observa os dois HPAs escalando em tempo real
 kubectl get hpa -n togglemaster -w
-```
 
-### HPA do analytics-service (por CPU via fila SQS)
-
-```bash
-# Envia 50 mensagens para a fila
-SQS_URL=$(cd terraform && terraform output -raw sqs_queue_url)
-for i in $(seq 1 50); do
-  aws sqs send-message \
-    --queue-url "$SQS_URL" \
-    --message-body "{\"user_id\":\"user-$i\",\"flag_name\":\"test-flag\",\"result\":true}"
-done
-
-# Observa o HPA
-kubectl get hpa analytics-service-hpa -n togglemaster -w
-
-# Verifica dados no DynamoDB
-aws dynamodb scan --table-name ToggleMasterAnalytics --region us-east-1
+# Após o teste — confirma eventos gravados no DynamoDB
+aws dynamodb scan --table-name ToggleMasterAnalytics --region us-east-1 --select COUNT
 ```
 
 ---
@@ -168,6 +166,7 @@ aws dynamodb scan --table-name ToggleMasterAnalytics --region us-east-1
 | `setup-service-key.sh local` | Cria API key no ambiente local e reinicia o evaluation-service |
 | `setup-service-key.sh aws` | Cria API key no ambiente AWS e atualiza o secret do Kubernetes |
 | `teardown.sh` | Remove toda a infraestrutura AWS (LB + terraform destroy) |
+| `copy-dockerfiles.sh` | Copia os Dockerfiles de `dockerfiles/` para dentro de cada `services/<nome>/` |
 
 ---
 

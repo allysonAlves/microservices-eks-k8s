@@ -80,12 +80,33 @@ resource "aws_iam_role_policy_attachment" "eks_sqs" {
 
 # ── Node Group ──────────────────────────────────────────────────────────────
 
+# hop limit=2 permite que os pods acessem o IMDS para obter credenciais do IAM role
+resource "aws_launch_template" "eks_nodes" {
+  name_prefix = "${var.project_name}-nodes-"
+
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_put_response_hop_limit = 2
+    http_tokens                 = "optional"
+  }
+
+  tag_specifications {
+    resource_type = "instance"
+    tags          = { Name = "${var.project_name}-node" }
+  }
+}
+
 resource "aws_eks_node_group" "main" {
   cluster_name    = aws_eks_cluster.main.name
   node_group_name = "${var.project_name}-nodes"
   node_role_arn   = aws_iam_role.eks_nodes.arn
   subnet_ids      = aws_subnet.private[*].id
   instance_types  = [var.eks_node_instance_type]
+
+  launch_template {
+    id      = aws_launch_template.eks_nodes.id
+    version = aws_launch_template.eks_nodes.latest_version
+  }
 
   scaling_config {
     min_size     = var.eks_node_min
