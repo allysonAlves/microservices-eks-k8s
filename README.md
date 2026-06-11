@@ -55,13 +55,50 @@ Depois rode:
 ./setup.sh
 ```
 
+> **O `setup.sh` aplica automaticamente os patches abaixo.** Eles estão documentados aqui por transparência — os repositórios dos serviços possuem bugs conhecidos que impedem o build sem correção.
+
+### Patches aplicados automaticamente pelo setup.sh
+
+#### auth-service — múltiplos erros de imports e `go.mod` inválido
+
+**1. `go.mod`** contém entrada incorreta:
+
+```
+github.com/jackc/pgx/v4/stdlib v4.18.3 // indirect
+```
+
+`stdlib` é um pacote dentro do módulo `github.com/jackc/pgx/v4`, não um módulo separado. **Correção:** remover essa linha.
+
+**2. `handlers.go`** importa `"crypto/sha256"` e `"encoding/hex"`, que são usados em `key.go`, não aqui. **Correção:** remover esses dois imports.
+
+**3. `key.go`** importa `"fmt"` sem usar. **Correção:** remover o import.
+
+**4. `main.go`** importa `"fmt"` sem usar e importa `"github.com/jackc/pgx/v4/stdlib"` de forma errada — esse pacote é usado apenas para registrar o driver como efeito colateral, portanto precisa de blank import. **Correção:** remover `"fmt"` e trocar o import do stdlib por `_ "github.com/jackc/pgx/v4/stdlib"`.
+
+#### evaluation-service — `evaluator.go` com imports incorretos
+
+- `"context"` está importado mas nunca usado
+- `os.Getenv(...)` é chamado no arquivo, mas `"os"` não está nos imports
+
+**Correção:** remover `"context"` e adicionar `"os"` nos imports.
+
+#### flag-service e targeting-service — incompatibilidade Flask 2.2 + Werkzeug 3.x
+
+Os `requirements.txt` de ambos os serviços declaram `Flask==2.2.2` sem pinar o Werkzeug. O pip resolve para a versão mais recente (3.x), que removeu `url_quote` — função ainda usada pelo Flask 2.2. Isso causa o erro em runtime:
+
+```
+ImportError: cannot import name 'url_quote' from 'werkzeug.urls'
+```
+
+**Correção:** adicionar `Werkzeug==2.3.7` (última versão 2.x) ao `requirements.txt` de ambos os serviços.
+
 ---
 
 ## Rodar local
 
 ```bash
 # 1. Sobe os 9 containers (5 apps + 2 PostgreSQL + Redis + DynamoDB Local)
-docker compose up --build
+docker compose up --build -d
 
 # 2. Cria a API key e configura o evaluation-service automaticamente
 ./setup-service-key.sh local
