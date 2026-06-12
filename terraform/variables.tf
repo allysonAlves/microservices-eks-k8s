@@ -21,7 +21,7 @@ variable "environment" {
 variable "eks_node_instance_type" {
   description = "EC2 instance type for EKS nodes"
   type        = string
-  default     = "t3.medium"
+  default     = "t3.small"
 }
 
 variable "eks_node_min" {
@@ -36,7 +36,7 @@ variable "eks_node_desired" {
 
 variable "eks_node_max" {
   type    = number
-  default = 4
+  default = 2
 }
 
 # ── RDS ────────────────────────────────────────────────────────────────────

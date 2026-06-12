@@ -170,7 +170,7 @@ resource "kubernetes_deployment" "auth_service" {
     labels    = { app = "auth-service" }
   }
   spec {
-    replicas = 2
+    replicas = 1
     selector {
       match_labels = { app = "auth-service" }
     }
@@ -244,7 +244,7 @@ resource "kubernetes_deployment" "flag_service" {
     labels    = { app = "flag-service" }
   }
   spec {
-    replicas = 2
+    replicas = 1
     selector {
       match_labels = { app = "flag-service" }
     }
@@ -318,7 +318,7 @@ resource "kubernetes_deployment" "targeting_service" {
     labels    = { app = "targeting-service" }
   }
   spec {
-    replicas = 2
+    replicas = 1
     selector {
       match_labels = { app = "targeting-service" }
     }
@@ -392,7 +392,7 @@ resource "kubernetes_deployment" "evaluation_service" {
     labels    = { app = "evaluation-service" }
   }
   spec {
-    replicas = 2
+    replicas = 1
     selector {
       match_labels = { app = "evaluation-service" }
     }
@@ -674,8 +674,8 @@ resource "kubernetes_horizontal_pod_autoscaler_v2" "evaluation_service" {
       kind        = "Deployment"
       name        = "evaluation-service"
     }
-    min_replicas = 2
-    max_replicas = 8
+    min_replicas = 1
+    max_replicas = 4
     metric {
       type = "Resource"
       resource {
@@ -702,7 +702,7 @@ resource "kubernetes_horizontal_pod_autoscaler_v2" "analytics_service" {
       name        = "analytics-service"
     }
     min_replicas = 1
-    max_replicas = 6
+    max_replicas = 3
     metric {
       type = "Resource"
       resource {
