@@ -91,6 +91,28 @@ resource "aws_route_table_association" "private" {
   route_table_id = aws_route_table.private.id
 }
 
+# ── VPC Gateway Endpoints (grátis) ──────────────────────────────────────────
+# Roteia o tráfego pra DynamoDB e S3 pela rede interna da AWS em vez do NAT.
+# S3 cobre o pull dos layers das imagens do ECR. Só adiciona rota; não altera o NAT.
+
+resource "aws_vpc_endpoint" "dynamodb" {
+  vpc_id            = aws_vpc.main.id
+  service_name      = "com.amazonaws.${var.aws_region}.dynamodb"
+  vpc_endpoint_type = "Gateway"
+  route_table_ids   = [aws_route_table.private.id]
+
+  tags = { Name = "${var.project_name}-dynamodb-endpoint" }
+}
+
+resource "aws_vpc_endpoint" "s3" {
+  vpc_id            = aws_vpc.main.id
+  service_name      = "com.amazonaws.${var.aws_region}.s3"
+  vpc_endpoint_type = "Gateway"
+  route_table_ids   = [aws_route_table.private.id]
+
+  tags = { Name = "${var.project_name}-s3-endpoint" }
+}
+
 # ── Security Groups ─────────────────────────────────────────────────────────
 
 resource "aws_security_group" "rds" {
